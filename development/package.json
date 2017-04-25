@@ -1,0 +1,25 @@
+{
+	"name": "ylib.js",
+	"version": "1.0.0",
+	"copyright": "YOOlabs GmbH, Jannik Mewes",
+
+	"prefix": "ylib",
+	"author": "Jannik Mewes",
+	"author_email": "jannik.mewes@yoolabs.com",
+	"author_url": "http://yoolabs.com",
+	"license": "http://www.gnu.org/copyleft/gpl.html GNU/GPL",
+
+	"id": "ylib",
+	"name": "ylib",
+	"camel": "YLib",
+	"title": "YLib",
+	"shortcode": "ylib",
+	"descr": "YLib",
+
+	"devDependencies": {
+		"grunt": "~0.4.1",
+		"grunt-contrib-concat": "~1.0.1",
+        "grunt-contrib-watch" : "~1.0.0",
+        "grunt-contrib-uglify" : "~2.3.0"
+	}
+}

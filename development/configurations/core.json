@@ -1,0 +1,7 @@
+{
+	"components" : [
+		"ylib.main",
+		"ylib.util",
+		"ylib.class"
+	]
+}

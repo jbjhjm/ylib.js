@@ -1,0 +1,6 @@
+# exclude folders
+/development/node_modules
+/release
+
+# ignore file types
+*.zip
