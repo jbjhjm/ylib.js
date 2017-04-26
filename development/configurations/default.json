@@ -1,9 +1,10 @@
 {
 	"components" : [
-		"ylib.main",
+		"pre",
 		"ylib.util",
 		"ylib.class",
 		"ylib.mixin.events",
-		"ylib.mixin.hooks"
+		"ylib.mixin.hooks",
+		"post"
 	]
 }

@@ -1,7 +1,8 @@
 {
 	"components" : [
-		"ylib.main",
+		"pre",
 		"ylib.util",
-		"ylib.class"
+		"ylib.class",
+		"post"
 	]
 }
