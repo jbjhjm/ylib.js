@@ -136,6 +136,8 @@ module.exports = function(grunt) {
 		}
 	});
 
+	grunt.registerTask('default', ['build']);
+
 
 	// use "grunt build:[name]"
 

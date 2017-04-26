@@ -1,0 +1,1 @@
+window.YLib = YLib = {};
