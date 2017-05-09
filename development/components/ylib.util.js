@@ -18,6 +18,47 @@ YLib.Util = YLib.Utils = {
 		return dest;
 	},
 
+	/*!
+	* Based on merge-deep <https://github.com/jonschlinkert/merge-deep>
+	* Copyright (c) 2014-2015, Jon Schlinkert. Licensed under the MIT License.
+	*/
+	extendDeep: function(orig /*, obj, ...*/) {
+
+		function _merge(target, obj) {
+			for (var key in obj) {
+				if (!_hasOwn(obj, key)) continue;
+				var objVal = obj[key], targetVal = target[key];
+
+				if (YLib.Util.isObject(targetVal) && YLib.Util.isObject(objVal)) {
+					target[key] = _merge(targetVal, objVal);
+				} else if (YLib.Util.isArray(targetVal)) {
+					target[key] = [].concat(objVal, targetVal);
+				} else {
+					target[key] = _clone(objVal);
+				}
+			}
+			return target;
+		}
+		function _hasOwn(obj, key) {
+			return Object.prototype.hasOwnProperty.call(obj, key);
+		}
+		function _clone(obj) {
+			return obj;
+		}
+
+		if (!YLib.Util.isObject(orig) && !YLib.Util.isArray(orig)) orig = {};
+
+		var target = YLib.Util.extend({}, orig);
+		var len = arguments.length;
+		var idx = 0;
+		while (++idx < len) {
+			var val = arguments[idx];
+			if (YLib.Util.isObject(val) || YLib.Util.isArray(val))  _merge(target, val);
+		}
+		return target;
+
+	},
+
 	bind: function (fn, obj) { // (Function, Object) -> Function
 		var args = arguments.length > 2 ? Array.prototype.slice.call(arguments, 2) : null;
 		return function () {
@@ -127,8 +168,12 @@ YLib.Util = YLib.Utils = {
 		});
 	},
 
-	isArray: function (obj) {
-		return (Object.prototype.toString.call(obj) === '[object Array]');
+	isArray: function (item) {
+		return (Object.prototype.toString.call(item) === '[object Array]');
+	},
+
+	isObject: function (item) {
+		return (item && typeof item === 'object' && !Array.isArray(item));
 	},
 
 	htmlSpecialChars : function(str) {
