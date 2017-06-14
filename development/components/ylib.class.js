@@ -33,7 +33,7 @@ YLib.Class.extend = function (props) {
     var NewClass = new Function("return function " + (props.className?props.className:'YLibClass') + "() {\n"
 		+ "if (typeof this.defineProps == 'function') this.defineProps(); "
 		+ "if (typeof this.initialize == 'function') this.initialize.apply(this, arguments); "
-		+ "if (this._initHooks) this.callInitHooks(); "
+		+ "if (this._initHooks) this.callInitHooks(arguments); "
 		+ "}");
     NewClass = NewClass();
 
@@ -79,18 +79,18 @@ YLib.Class.extend = function (props) {
 	NewClass.__super__ = parent.prototype;
 
 	// add method for calling all hooks
-	proto.callInitHooks = function () {
+	proto.callInitHooks = function (args) {
 
 		if (this._initHooksCalled) { return; }
 
 		if (parent.prototype.callInitHooks) {
-			parent.prototype.callInitHooks.call(this);
+			parent.prototype.callInitHooks.call(this,args);
 		}
 
 		this._initHooksCalled = true;
 
 		for (var i = 0, len = proto._initHooks.length; i < len; i++) {
-			proto._initHooks[i].call(this);
+			proto._initHooks[i].apply(this,arguments);
 		}
 	};
 

@@ -105,7 +105,8 @@ YLib.Mixin.Hooks = {
 			var remove = [];
 			for (i = 0, len = subscribers.length; i < len; i++) {
 				if(!subscribers[i] || !subscribers[i].action) {
-					break;
+					console.warn("invalid hook listener for hook "+type+" at index "+i);
+					continue;
 				}
 				subscribers[i].action.call(subscribers[i].context || this, hook, data);
 			}

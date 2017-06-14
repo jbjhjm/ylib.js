@@ -1,7 +1,7 @@
 /*! 
   * @package    ylib
- * @version    1.0.0
- * @date       2017-05-11
+ * @version    1.0.1
+ * @date       2017-06-14
  * @author     Jannik Mewes
  * @copyright  Copyright (c) 2017 YOOlabs GmbH, Jannik Mewes
  */
@@ -480,7 +480,7 @@ YLib.Class.extend = function (props) {
     var NewClass = new Function("return function " + (props.className?props.className:'YLibClass') + "() {\n"
 		+ "if (typeof this.defineProps == 'function') this.defineProps(); "
 		+ "if (typeof this.initialize == 'function') this.initialize.apply(this, arguments); "
-		+ "if (this._initHooks) this.callInitHooks(); "
+		+ "if (this._initHooks) this.callInitHooks(arguments); "
 		+ "}");
     NewClass = NewClass();
 
@@ -526,18 +526,18 @@ YLib.Class.extend = function (props) {
 	NewClass.__super__ = parent.prototype;
 
 	// add method for calling all hooks
-	proto.callInitHooks = function () {
+	proto.callInitHooks = function (args) {
 
 		if (this._initHooksCalled) { return; }
 
 		if (parent.prototype.callInitHooks) {
-			parent.prototype.callInitHooks.call(this);
+			parent.prototype.callInitHooks.call(this,args);
 		}
 
 		this._initHooksCalled = true;
 
 		for (var i = 0, len = proto._initHooks.length; i < len; i++) {
-			proto._initHooks[i].call(this);
+			proto._initHooks[i].apply(this,arguments);
 		}
 	};
 
@@ -1156,7 +1156,8 @@ YLib.Mixin.Hooks = {
 			var remove = [];
 			for (i = 0, len = subscribers.length; i < len; i++) {
 				if(!subscribers[i] || !subscribers[i].action) {
-					break;
+					console.warn("invalid hook listener for hook "+type+" at index "+i);
+					continue;
 				}
 				subscribers[i].action.call(subscribers[i].context || this, hook, data);
 			}
