@@ -60,8 +60,13 @@ YLib.Class.extend = function (props) {
 
 	// mix includes into the prototype
 	if (props.includes) {
+		props._mixins = [];
 		for(var i=0; i<props.includes.length; i++) {
-			if(typeof props.includes[i] == 'string' && typeof YLib.Mixin[props.includes[i]] != 'undefined') props.includes[i] = YLib.Mixin[props.includes[i]]
+			if(typeof props.includes[i] == 'string' && typeof YLib.Mixin[props.includes[i]] != 'undefined') {
+				// is a mixin
+				props._mixins.push(props.includes[i]);
+				props.includes[i] = YLib.Mixin[props.includes[i]];
+			}
 		}
 		YLib.Util.extend.apply(null, [proto].concat(props.includes));
 		delete props.includes;
@@ -100,6 +105,12 @@ YLib.Class.extend = function (props) {
 	return NewClass;
 };
 YLib.Class.include = function (props) {
+	if(typeof props == 'string' && typeof YLib.Mixin[props] != 'undefined') {
+		// is a mixin
+		if(!this.prototype._mixins) this.prototype._mixins = [];
+		this.prototype._mixins.push(props);
+		props = YLib.Mixin[props];
+	}
 	YLib.extend(this.prototype, props);
 };
 YLib.Class.mergeOptions = function (options) {
