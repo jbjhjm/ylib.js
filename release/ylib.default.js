@@ -1,7 +1,7 @@
 /*! 
   * @package    ylib
- * @version    1.0.1
- * @date       2017-06-14
+ * @version    1.0.2
+ * @date       2017-06-19
  * @author     Jannik Mewes
  * @copyright  Copyright (c) 2017 YOOlabs GmbH, Jannik Mewes
  */
@@ -507,6 +507,9 @@ YLib.Class.extend = function (props) {
 
 	// mix includes into the prototype
 	if (props.includes) {
+		for(var i=0; i<props.includes.length; i++) {
+			if(typeof props.includes[i] == 'string' && typeof YLib.Mixin[props.includes[i]] != 'undefined') props.includes[i] = YLib.Mixin[props.includes[i]]
+		}
 		YLib.Util.extend.apply(null, [proto].concat(props.includes));
 		delete props.includes;
 	}
