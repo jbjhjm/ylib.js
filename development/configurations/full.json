@@ -2,6 +2,9 @@
 	"components" : [
 		"pre",
 		"ylib.util",
+		"ylib.util.url",
+		"ylib.util.animation",
+		"ylib.util.sprintf",
 		"ylib.class",
 		"ylib.uuid",
 		"ylib.protectedclass",
