@@ -3,6 +3,7 @@
 		"pre",
 		"ylib.util",
 		"ylib.util.url",
+		"ylib.util.objPath",
 		"ylib.class",
 		"ylib.mixin.events",
 		"ylib.mixin.hooks",
