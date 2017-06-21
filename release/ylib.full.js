@@ -1,7 +1,7 @@
 /*! 
   * @package    ylib
- * @version    1.0.2.1
- * @date       2017-06-19
+ * @version    1.0.3
+ * @date       2017-06-21
  * @author     Jannik Mewes
  * @copyright  Copyright (c) 2017 YOOlabs GmbH, Jannik Mewes
  */
@@ -128,10 +128,6 @@ YLib.Util = YLib.Utils = {
 		};
 	},
 
-	falseFn: function () {
-		return false;
-	},
-
 	formatNum: function (num, digits) {
 		var pow = Math.pow(10, digits || 5);
 		return Math.round(num * pow) / pow;
@@ -150,25 +146,6 @@ YLib.Util = YLib.Utils = {
 		return obj.options;
 	},
 
-	getParamString: function (obj, existingUrl) {
-		var params = [];
-		for (var i in obj) {
-			params.push(encodeURIComponent(i) + '=' + encodeURIComponent(obj[i]));
-		}
-		return ((!existingUrl || existingUrl.indexOf('?') === -1) ? '?' : '&') + params.join('&');
-	},
-	getURLParams: function(url){
-		var params = {};
-		if ( url.indexOf("?") > -1 ) {
-			var queryString = url.substr(url.indexOf("?")+1);
-			var queryArray = queryString.split("&");
-			for ( var i = 0; i < queryArray.length; i++ ){
-				var param = queryArray[i].split("=");
-				params[param[0]] = param[1];
-			}
-		}
-		return params;
-	},
 	template: function (str, data) {
 		return str.replace(/\{ *([\w_]+) *\}/g, function (str, key) {
 			var value = data[key];
@@ -209,12 +186,89 @@ YLib.Util = YLib.Utils = {
 		return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
 	},
 
+    jsonParse : function(str) {
+		if(!str) return false;
+        return JSON.parse(str
+            // wrap keys without quote with valid double quote
+            .replace(/([\$\w]+)\s*:/g, function(_, $1){return '"'+$1+'":';})
+            // replacing single quote wrapped ones to double quote
+            .replace(/'([^']+)'/g, function(_, $1){return '"'+$1+'"';})
+        );
+    },
+
 	emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 };
 YLib.extend = YLib.Util.extend;
 YLib.bind = YLib.Util.bind;
 YLib.stamp = YLib.Util.stamp;
 YLib.setOptions = YLib.Util.setOptions;
+
+
+YLib.Util.getParamString = function (obj, existingUrl) {
+	var params = [];
+	for (var i in obj) {
+		params.push(encodeURIComponent(i) + '=' + encodeURIComponent(obj[i]));
+	}
+	return ((!existingUrl || existingUrl.indexOf('?') === -1) ? '?' : '&') + params.join('&');
+};
+
+YLib.Util.getURLParams = function(url){
+	var params = {};
+	if ( url.indexOf("?") > -1 ) {
+		var queryString = url.substr(url.indexOf("?")+1);
+		var queryArray = queryString.split("&");
+		for ( var i = 0; i < queryArray.length; i++ ){
+			var param = queryArray[i].split("=");
+			params[param[0]] = param[1];
+		}
+	}
+	return params;
+};
+
+
+YLib.Util.objPath = {
+	_splitPath:function(path){
+		if(!YLib.Utils.isArray(path)) {
+			path=path.split(/[.\[]+/);
+		}
+		for (var i=0; i<path.length; i++){
+			if(path[i].substr(-1)==']') path[i] = parseInt(path[i]);
+		};
+		console.log(path);
+		return path;
+	},
+	get:function(obj,path){
+		path = this._splitPath(path);
+		for (var i=0, len=path.length; i<len; i++){
+			if(typeof obj[path[i]] == 'undefined') return undefined;
+			obj = obj[path[i]];
+		};
+		return obj;
+	},
+	set:function(obj,path,value,createMissing){
+		path = this._splitPath(path);
+		for (var i=0, len=path.length; i<len; i++){
+			if(i+1==len) {
+				// last part of path. set value here.
+				// console.log('Set value',path,i,len);
+				obj[path[i]] = value;
+				return true;
+			} else {
+				// find or add prop.
+				// console.log('Go deeper',path,i,len,obj);
+				if(typeof obj[path[i]] == 'undefined') {
+					if(createMissing) {
+						// console.log('create missing',path[i],path[i+1], typeof path[i+1]);
+						obj[path[i]] = (typeof path[i+1] == 'number') ? [] : {};
+					} else {
+						return false;
+					}
+				}
+				obj = obj[path[i]];
+			}
+		};
+	}
+};
 
 
 // !inspired by http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -264,6 +318,11 @@ YLib.setOptions = YLib.Util.setOptions;
 			cancelFn.call(window, id);
 		}
 	};
+
+})();
+
+
+(function () {
 
 /*!
  *	sprintf implementation programmed by Alexei - thanks!
@@ -433,15 +492,6 @@ YLib.setOptions = YLib.Util.setOptions;
         return Array(multiplier + 1).join(input);
     }
 
-    YLib.Util.jsonParse = function(str) {
-		if(!str) return false;
-        return JSON.parse(str
-            // wrap keys without quote with valid double quote
-            .replace(/([\$\w]+)\s*:/g, function(_, $1){return '"'+$1+'":';})
-            // replacing single quote wrapped ones to double quote
-            .replace(/'([^']+)'/g, function(_, $1){return '"'+$1+'"';})
-        );
-    }
 
 }());
 
@@ -507,13 +557,13 @@ YLib.Class.extend = function (props) {
 
 	// mix includes into the prototype
 	if (props.includes) {
-		props._includes = [];
+		props._mixins = [];
 		for(var i=0; i<props.includes.length; i++) {
-			if(typeof props.includes[i] == 'string'
-				&& typeof YLib.Mixin[props.includes[i]] != 'undefined') {
-					props._includes.push(props.includes[i]);
-					props.includes[i] = YLib.Mixin[props.includes[i]];
-				}
+			if(typeof props.includes[i] == 'string' && typeof YLib.Mixin[props.includes[i]] != 'undefined') {
+				// is a mixin
+				props._mixins.push(props.includes[i]);
+				props.includes[i] = YLib.Mixin[props.includes[i]];
+			}
 		}
 		YLib.Util.extend.apply(null, [proto].concat(props.includes));
 		delete props.includes;
@@ -552,12 +602,12 @@ YLib.Class.extend = function (props) {
 	return NewClass;
 };
 YLib.Class.include = function (props) {
-	if(typeof props == 'string'
-		&& typeof YLib.Mixin[props] != 'undefined') {
-			if(!this.prototype._includes) this.prototype._includes = [];
-			this.prototype._includes.push(props);
-			props = YLib.Mixin[props];
-		}
+	if(typeof props == 'string' && typeof YLib.Mixin[props] != 'undefined') {
+		// is a mixin
+		if(!this.prototype._mixins) this.prototype._mixins = [];
+		this.prototype._mixins.push(props);
+		props = YLib.Mixin[props];
+	}
 	YLib.extend(this.prototype, props);
 };
 YLib.Class.mergeOptions = function (options) {
