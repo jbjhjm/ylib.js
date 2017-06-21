@@ -7,7 +7,7 @@ YLib.Util.objPath = {
 		for (var i=0; i<path.length; i++){
 			if(path[i].substr(-1)==']') path[i] = parseInt(path[i]);
 		};
-		console.log(path);
+		// console.log(path);
 		return path;
 	},
 	get:function(obj,path){

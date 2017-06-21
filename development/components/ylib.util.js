@@ -185,6 +185,7 @@ YLib.Util = YLib.Utils = {
 
 	emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 };
+
 YLib.extend = YLib.Util.extend;
 YLib.bind = YLib.Util.bind;
 YLib.stamp = YLib.Util.stamp;

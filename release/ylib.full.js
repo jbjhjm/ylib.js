@@ -198,6 +198,7 @@ YLib.Util = YLib.Utils = {
 
 	emptyImageUrl: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 };
+
 YLib.extend = YLib.Util.extend;
 YLib.bind = YLib.Util.bind;
 YLib.stamp = YLib.Util.stamp;
@@ -234,7 +235,7 @@ YLib.Util.objPath = {
 		for (var i=0; i<path.length; i++){
 			if(path[i].substr(-1)==']') path[i] = parseInt(path[i]);
 		};
-		console.log(path);
+		// console.log(path);
 		return path;
 	},
 	get:function(obj,path){
