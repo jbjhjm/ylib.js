@@ -63,35 +63,35 @@ module.exports = function(grunt) {
 					banner: pkg.banner,
 					beautify: false,
 					preserveComments: 'some',
-					mangle: false,
+					// mangle: {
+					// 	except:['YLib','jQuery']
+					// },
+					// mangleProperties: false,
+					// exceptionsFiles: [
+					// 	'<%= meta.srcPath %>preservedProperties.json'
+					// ],
+					// nameCache: '',
+					// reserveDOMProperties: true,
 					compress: {
 						global_defs: {
 							"DEBUG": false
 						},
 						drop_debugger : false
-					}
+					},
+					sourceMap: true,
 				},
 				files: {
 
-				}
+				},
+				// wrap,
 			}
 		},
 
-		// watch: {
-		// 	default : {
-		// 		files: ['<%= meta.srcPath %>component/**/*','<%= meta.srcPath %>plugin/**/*','<%= meta.srcPath %>js/**/*'],
-		// 		tasks: [ ]
-		// 	}
-		// }
 	});
 
 	// These plugins provide necessary tasks.
-	// grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	// grunt.loadNpmTasks('grunt-contrib-watch');
-	// grunt.loadNpmTasks('grunt-contrib-clean');
-	// grunt.loadNpmTasks('grunt-contrib-requirejs');
 
 
 	grunt.registerTask('build', function(name) {

@@ -68,7 +68,7 @@ YLib.Class.extend = function (props) {
 				props.includes[i] = YLib.Mixin[props.includes[i]];
 			}
 		}
-		YLib.Util.extend.apply(null, [proto].concat(props.includes));
+		YLib.Util.extendConcat.apply(null, [proto].concat(props.includes));
 		delete props.includes;
 	}
 
@@ -78,7 +78,7 @@ YLib.Class.extend = function (props) {
 	}
 
 	// mix given properties into the prototype
-	YLib.extend(proto, props);
+	YLib.Util.extendConcat(proto, props);
 
 
 	var parent = this;

@@ -1,7 +1,7 @@
 /*! 
   * @package    ylib
- * @version    1.0.3
- * @date       2017-06-21
+ * @version    1.0.4
+ * @date       2017-11-01
  * @author     Jannik Mewes
  * @copyright  Copyright (c) 2017 YOOlabs GmbH, Jannik Mewes
  */
@@ -25,6 +25,22 @@ YLib.Util = YLib.Utils = {
 			for (i in src) {
 				if (src.hasOwnProperty(i)) {
 					dest[i] = src[i];
+				}
+			}
+		}
+		return dest;
+	},
+
+	extendConcat: function (dest) { // (Object[, Object, ...]) -> // like extend, but concat arrays
+		var sources = Array.prototype.slice.call(arguments, 1),
+		    i, j, len, src;
+
+		for (j = 0, len = sources.length; j < len; j++) {
+			src = sources[j] || {};
+			for (i in src) {
+				if (src.hasOwnProperty(i)) {
+					if(YLib.Util.isArray(dest[i]) && YLib.Util.isArray(src[i])) dest[i] = dest[i].concat(src[i]);
+					else dest[i] = src[i];
 				}
 			}
 		}
@@ -341,7 +357,7 @@ YLib.Class.extend = function (props) {
 				props.includes[i] = YLib.Mixin[props.includes[i]];
 			}
 		}
-		YLib.Util.extend.apply(null, [proto].concat(props.includes));
+		YLib.Util.extendConcat.apply(null, [proto].concat(props.includes));
 		delete props.includes;
 	}
 
@@ -351,7 +367,7 @@ YLib.Class.extend = function (props) {
 	}
 
 	// mix given properties into the prototype
-	YLib.extend(proto, props);
+	YLib.Util.extendConcat(proto, props);
 
 
 	var parent = this;

@@ -18,6 +18,22 @@ YLib.Util = YLib.Utils = {
 		return dest;
 	},
 
+	extendConcat: function (dest) { // (Object[, Object, ...]) -> // like extend, but concat arrays
+		var sources = Array.prototype.slice.call(arguments, 1),
+		    i, j, len, src;
+
+		for (j = 0, len = sources.length; j < len; j++) {
+			src = sources[j] || {};
+			for (i in src) {
+				if (src.hasOwnProperty(i)) {
+					if(YLib.Util.isArray(dest[i]) && YLib.Util.isArray(src[i])) dest[i] = dest[i].concat(src[i]);
+					else dest[i] = src[i];
+				}
+			}
+		}
+		return dest;
+	},
+
 	/*!
 	* Based on merge-deep <https://github.com/jonschlinkert/merge-deep>
 	* Copyright (c) 2014-2015, Jon Schlinkert. Licensed under the MIT License.
