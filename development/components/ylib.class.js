@@ -8,24 +8,24 @@ YLib.Class.prototype.DEBUG = false;
 YLib.Class.prototype.initialize = function () {
 
 };
-YLib.Class.prototype.showError = function(msg){
-	$err = jQuery('<div class="msg alert alert-error"></div>');
-
-	 msg = YLib.Util.sprintf('Error: %s', msg);
-
-	if(typeof self.$messageFrame == 'undefined') self.$messageFrame = jQuery('#system-message-container');
-	$err.html(msg);
-	$err.insertBefore(self.$messageFrame);
-	console.error(msg);
-};
-
-YLib.Class.prototype.showMessage = function(msg){
-	$msg = jQuery('<div class="msg alert alert-notification"></div>');
-
-	if(typeof self.$messageFrame == 'undefined') self.$messageFrame = jQuery('#system-message-container');
-	$msg.html(msg);
-	$msg.insertBefore(self.$messageFrame);
-};
+// YLib.Class.prototype.showError = function(msg){
+// 	$err = jQuery('<div class="msg alert alert-error"></div>');
+//
+// 	 msg = YLib.Util.sprintf('Error: %s', msg);
+//
+// 	if(typeof self.$messageFrame == 'undefined') self.$messageFrame = jQuery('#system-message-container');
+// 	$err.html(msg);
+// 	$err.insertBefore(self.$messageFrame);
+// 	console.error(msg);
+// };
+//
+// YLib.Class.prototype.showMessage = function(msg){
+// 	$msg = jQuery('<div class="msg alert alert-notification"></div>');
+//
+// 	if(typeof self.$messageFrame == 'undefined') self.$messageFrame = jQuery('#system-message-container');
+// 	$msg.html(msg);
+// 	$msg.insertBefore(self.$messageFrame);
+// };
 
 YLib.Class.extend = function (props) {
 
@@ -33,7 +33,7 @@ YLib.Class.extend = function (props) {
     var NewClass = new Function("return function " + (props.className?props.className:'YLibClass') + "() {\n"
 		+ "if (typeof this.defineProps == 'function') this.defineProps(); "
 		+ "if (typeof this.initialize == 'function') this.initialize.apply(this, arguments); "
-		+ "if (this._initHooks) this.callInitHooks(arguments); "
+		+ "if (this._initHooks) this.callInitHooks.apply(this, arguments); "
 		+ "}");
     NewClass = NewClass();
 
@@ -42,7 +42,9 @@ YLib.Class.extend = function (props) {
 	F.prototype = this.prototype;
 	var proto = new F();
 	proto.constructor = NewClass;
-	proto._initHooks = [];
+	proto._initHooks = proto._initHooks ? proto._initHooks.slice() : [];
+	proto._includes = proto._includes ? proto._includes.slice() : [];
+	// proto._mixins = proto._mixins || [];
 	NewClass.prototype = proto;
 
 	//inherit parent's statics
@@ -60,12 +62,16 @@ YLib.Class.extend = function (props) {
 
 	// mix includes into the prototype
 	if (props.includes) {
-		props._mixins = [];
+		// props._mixins = [];
 		for(var i=0; i<props.includes.length; i++) {
 			if(typeof props.includes[i] == 'string' && typeof YLib.Mixin[props.includes[i]] != 'undefined') {
 				// is a mixin
-				props._mixins.push(props.includes[i]);
-				props.includes[i] = YLib.Mixin[props.includes[i]];
+				// prevent duplicates
+				if(proto._includes.indexOf(props.includes[i]) === -1) {
+					proto._includes.push(props.includes[i]);
+					// props._mixins.push(props.includes[i]);
+					props.includes[i] = YLib.Mixin[props.includes[i]];
+				}
 			}
 		}
 		YLib.Util.extendConcat.apply(null, [proto].concat(props.includes));
@@ -87,12 +93,12 @@ YLib.Class.extend = function (props) {
 	NewClass.__super__ = parent.prototype;
 
 	// add method for calling all hooks
-	proto.callInitHooks = function (args) {
+	proto.callInitHooks = function () {
 
-		if (this._initHooksCalled) { return; }
+		if (this._initHooksCalled) return;
 
 		if (parent.prototype.callInitHooks) {
-			parent.prototype.callInitHooks.call(this,args);
+			parent.prototype.callInitHooks.apply(this,arguments);
 		}
 
 		this._initHooksCalled = true;
@@ -107,9 +113,12 @@ YLib.Class.extend = function (props) {
 YLib.Class.include = function (props) {
 	if(typeof props == 'string' && typeof YLib.Mixin[props] != 'undefined') {
 		// is a mixin
-		if(!this.prototype._mixins) this.prototype._mixins = [];
-		this.prototype._mixins.push(props);
-		props = YLib.Mixin[props];
+		// prevent duplicates
+		if(this.prototype._includes.indexOf(props) === -1) {
+			this.prototype._includes.push(props);
+			// this.prototype._mixins.push(props);
+			props = YLib.Mixin[props];
+		}
 	}
 	YLib.extend(this.prototype, props);
 };
