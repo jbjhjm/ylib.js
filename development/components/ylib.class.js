@@ -97,9 +97,9 @@ YLib.Class.extend = function (props) {
 
 		if (this._initHooksCalled) return;
 
-		if (parent.prototype.callInitHooks) {
-			parent.prototype.callInitHooks.apply(this,arguments);
-		}
+		// if (parent.prototype.callInitHooks) {
+		// 	parent.prototype.callInitHooks.apply(this,arguments);
+		// }
 
 		this._initHooksCalled = true;
 
